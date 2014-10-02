@@ -11,4 +11,4 @@ RVERSION=$(grep 'RHEL_RELEASE ' /usr/include/linux/version.h | cut -d'"' -f2)
 RHELMAJORSTR=$(grep RHEL_MAJOR /usr/include/linux/version.h)
 RHELMAJOR=${RHELMAJORSTR##* }
 
-printf "%d.%d.%d-%s.el%d\n" $KVERSION1 $KVERSION2 $KVERSION3 $RVERSION $RHELMAJOR
+printf "%%define kversion %d.%d.%d-%s.el%d\n" $KVERSION1 $KVERSION2 $KVERSION3 $RVERSION $RHELMAJOR
