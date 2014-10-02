@@ -8,7 +8,7 @@ License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
-BuildRequires: kernel-devel, pam-devel, flex, bison
+BuildRequires: kernel, kernel-devel, pam-devel, flex, bison
 
 ExclusiveArch: %{ix86} x86_64
 
