@@ -2,7 +2,7 @@
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: 1.6.9
+Version: 1.6.10
 Release: 1%{?dist}
 License: IBM Public License
 URL: http://www.openafs.org
