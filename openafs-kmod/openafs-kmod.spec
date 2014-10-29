@@ -1,4 +1,5 @@
 # Openafs Spec $Revision$
+%define pkgrel 1.0
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -8,7 +9,7 @@ License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
-BuildRequires: kernel, kernel-devel, pam-devel, flex, bison
+BuildRequires: pam-devel, flex, bison
 
 ExclusiveArch: %{ix86} x86_64
 
@@ -17,6 +18,10 @@ Source0: http://www.openafs.org/dl/openafs/%{version}/openafs-%{version}-src.tar
 Source10: http://www.openafs.org/dl/openafs/%{version}/RELNOTES-%{version}
 Source11: http://www.openafs.org/dl/openafs/%{version}/ChangeLog
 Source13: find-installed-kversion.sh
+Source14: openafs-kmodtool
+
+%{expand:%(sh %{SOURCE13})}
+%{expand:%(sh %{SOURCE14} rpmtemplate openafs %{kversion} /usr/sbin/depmod "")}
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -25,9 +30,6 @@ Facilities are provided for access control, authentication, backup and
 administrative management.
 
 This package provides the kernel module for the OpenAFS client
-
-%{expand:%(sh %{SOURCE13})}
-%{expand:%(sh /usr/lib/rpm/redhat/kmodtool rpmtemplate openafs %{kversion} "")}
 
 
 ##############################################################################
