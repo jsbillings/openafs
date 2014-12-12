@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -x /usr/bin/rpm ]] && /usr/bin/rpm --quiet -q kernel-headers; then
-        /usr/bin/rpm -q --qf '%%define kversion %{version}-%{release}\n' kernel-headers
+        exec /usr/bin/rpm -q --qf '%%define kversion %{version}-%{release}\n' kernel-headers
 else
 
 KVERSIONSTR=$(grep LINUX_VERSION_CODE /usr/include/linux/version.h)
