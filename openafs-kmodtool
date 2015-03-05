@@ -5,7 +5,6 @@
 #                         Thorsten Leemhuis <fedora@leemhuis.info>
 #
 # Modified by Simon Wilkinson for OpenAFS
-# Modified by Jonathan Billings for OpenAFS
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -35,8 +34,6 @@ kmod_name=
 kver=
 verrel=
 variant=
-kmod_version=%{version}
-kmod_release=%{pkgrel}
 
 get_verrel ()
 {
@@ -93,7 +90,6 @@ get_rpmtemplate ()
         *.fc9*)   kname="${verrel}.%{_target_cpu}${variant:+.${variant}}" ;;
         *)        kname="${verrel}${variant}"                             ;;
     esac
-    local kmod_release_kversion=$(echo $verrel} | tr '-' '_')
 
     cat <<EOF
 %package       -n kmod-${kmod_name}${dashvariant}
@@ -111,33 +107,10 @@ BuildRequires:    kernel${dashvariant}-devel-%{_target_cpu} = ${verrel}
 %description   -n kmod-${kmod_name}${dashvariant}
 This package provides the ${kmod_name} kernel modules built for the Linux
 kernel ${kname} for the %{_target_cpu} family of processors.
-
 %post          -n kmod-${kmod_name}${dashvariant}
-if [ -e "/boot/System.map-${kname}" ]; then
-    /usr/sbin/depmod -aeF "/boot/System.map-${kname}" "${kname}" > /dev/null || :
-fi
-
-modules=( \$(find /lib/modules/${kname}/extra/${kmod_name} | grep '\.ko$') )
-if [ -x "/sbin/weak-modules" ]; then
-    printf '%s\n' "\${modules[@]}" \
-    | /sbin/weak-modules --add-modules
-fi
-
-%preun         -n kmod-${kmod_name}${dashvariant}
-rpm -ql kmod-${kmod_name}${dashvariant}-${kmod_version}-${kmod_release}.${kmod_release_kversion} | grep '\.ko$' > /var/run/rpm-kmod-${kmod_name}${dashvariant}-modules
-
+${depmod} -aeF /boot/System.map-${kname} ${kname} > /dev/null || :
 %postun        -n kmod-${kmod_name}${dashvariant}
-if [ -e "/boot/System.map-${kname}" ]; then
-    /usr/sbin/depmod -aeF "/boot/System.map-${kname}" "${kname}" > /dev/null || :
-fi
-
-modules=( \$(cat /var/run/rpm-kmod-${kmod_name}${dashvariant}-modules) )
-rm /var/run/rpm-kmod-${kmod_name}${dashvariant}-modules
-if [ -x "/sbin/weak-modules" ]; then
-    printf '%s\n' "\${modules[@]}" \
-    | /sbin/weak-modules --remove-modules
-fi
-
+${depmod} -aF /boot/System.map-${kname} ${kname} &> /dev/null || :
 %files         -n kmod-${kmod_name}${dashvariant}
 %defattr(644,root,root,755)
 /lib/modules/${kname}/extra/${kmod_name}/
@@ -180,13 +153,13 @@ You called: ${invocation}
 
 Usage: ${myprog} <command> <option>+
  Commands:
-  verrel <uname>                               
+  verrel <uname>
     - Get "base" version-release.
-  variant <uname>                               
+  variant <uname>
     - Get variant from uname.
-  rpmtemplate <mainpgkname> <uname> </path/to/depmod> <variants> 
+  rpmtemplate <mainpgkname> <uname> </path/to/depmod> <variants>
     - Return a template for
-  version  
+  version
     - Output version number and exit.
 EOF
 }
