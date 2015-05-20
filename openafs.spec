@@ -4,7 +4,7 @@
 %define pkgvers 1.6.11.1
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 1
+%define pkgrel 2
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -40,6 +40,7 @@ ExclusiveArch: %{ix86} x86_64 ia64 s390 s390x sparc64 ppc ppc64
 #    http://dl.openafs.org/dl/openafs/candidate/%{afsvers}/...
 Source0: http://www.openafs.org/dl/openafs/%{afsvers}/openafs-%{afsvers}-src.tar.bz2
 Source1: http://www.openafs.org/dl/openafs/%{afsvers}/openafs-%{afsvers}-doc.tar.bz2
+Source3: openafs-client.service
 %define srcdir openafs-%{afsvers}
 
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
@@ -325,7 +326,7 @@ install -m 755 src/packaging/RedHat/openafs-server.init $RPM_BUILD_ROOT%{initdir
 %else
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules
-install -m 755 src/packaging/RedHat/openafs-client.service $RPM_BUILD_ROOT%{_unitdir}/openafs-client.service
+install -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/openafs-client.service
 install -m 755 src/packaging/RedHat/openafs-client.modules $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/openafs-client.modules
 install -m 755 src/packaging/RedHat/openafs-server.service $RPM_BUILD_ROOT%{_unitdir}/openafs-server.service
 %endif
@@ -931,6 +932,10 @@ fi
 ###
 ##############################################################################
 %changelog
+* Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-2
+- Include our own openafs-client.service, which fixes several startup
+  issues.
+
 * Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-1
 - rebuilt against 1.6.11.1
 

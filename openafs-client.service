@@ -1,0 +1,23 @@
+[Unit]
+Description=OpenAFS Client Service
+Wants=network-online.target
+After=syslog.target network-online.target
+Before=remote-fs.target
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+EnvironmentFile=/etc/sysconfig/openafs
+ExecStartPre=/bin/sed -n 'w/etc/openafs/CellServDB' /etc/openafs/CellServDB.local /etc/openafs/CellServDB.dist
+ExecStartPre=/bin/chmod 0644 /etc/openafs/CellServDB
+ExecStartPre=/sbin/modprobe openafs
+ExecStart=/usr/sbin/afsd $AFSD_ARGS
+ExecStop=/bin/umount -a -t afs
+ExecStop=/bin/umount -af -t afs
+ExecStop=/usr/sbin/afsd -shutdown
+ExecStop=/sbin/rmmod openafs
+GuessMainPID=no
+KillMode=none
+
+[Install]
+WantedBy=multi-user.target remote-fs.target
