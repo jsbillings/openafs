@@ -1,16 +1,16 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.11
+%define afsvers 1.6.11.1
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: 1.6.11
+Version: 1.6.11.1
 Release: %{pkgrel}%{?dist}
 License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
-BuildRequires: pam-devel, flex, bison
+BuildRequires: pam-devel, flex, bison, automake, autoconf
 
 ExclusiveArch: %{ix86} x86_64
 
@@ -89,6 +89,10 @@ case %{_arch} in
        i386|i486|i586|i686|athlon)     sysname=i386_linux26         ;;
        *)                              sysname=%{_arch}_linux26     ;;
 esac
+
+if [[ ! -f configure ]]; then
+   sh regen.sh
+fi
 
 ./configure --with-afs-sysname=${sysname} \
   	--prefix=%{_prefix} \
@@ -189,6 +193,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-1
+- Rebuilt for 1.6.11.1
+
 * Mon Mar 02 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11-1.1
 - Rebuilt for 1.6.11
 

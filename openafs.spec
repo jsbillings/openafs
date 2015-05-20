@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.11
-%define pkgvers 1.6.11
+%define afsvers 1.6.11.1
+%define pkgvers 1.6.11.1
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 %define pkgrel 1
@@ -25,7 +25,7 @@ URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: OpenAFS Gatekeepers <openafs-gatekeepers@openafs.org>
 Group: Networking/Filesystems
-BuildRequires: %{?kdepend:%{kdepend}, } pam-devel, ncurses-devel, flex, bison
+BuildRequires: %{?kdepend:%{kdepend}, } pam-devel, ncurses-devel, flex, bison, automake, autoconf
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 BuildRequires: systemd-units
 %endif
@@ -271,6 +271,11 @@ CFLAGS="$RPM_OPT_FLAGS"; export CFLAGS
 
 KRB5_CONFIG="%{krb5config}"
 export KRB5_CONFIG
+
+if [[ ! -f configure ]]; then
+   sh regen.sh
+fi
+
 %configure \
        --with-afs-sysname=${sysname} \
        --disable-strip-binaries \
@@ -926,6 +931,9 @@ fi
 ###
 ##############################################################################
 %changelog
+* Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-1
+- rebuilt against 1.6.11.1
+
 * Mon Mar 02 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11-1
 - rebuilt against 1.6.11
 
