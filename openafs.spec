@@ -4,7 +4,7 @@
 %define pkgvers 1.6.11.1
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 2
+%define pkgrel 3
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -528,6 +528,23 @@ rm -f openafs-file-list
 ### scripts
 ###
 ##############################################################################
+%pretrans -p <lua> transarc-client
+-- Moves an existing cache directory out of the way so symlink
+-- can be created
+path = "/usr/vice/cache"
+st = posix.stat(path)
+if st and st.type == "directory" then
+  status = os.rename(path, path .. ".rpmmoved")
+  if not status then
+    suffix = 0
+    while not status do
+      suffix = suffix + 1
+      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
+    end
+    os.rename(path, path .. ".rpmmoved")
+  end
+end
+
 %post client
 %if 0%{?fedora} < 15 && 0%{?rhel} < 7
 chkconfig --add openafs-client
@@ -913,6 +930,7 @@ fi
 %defattr(-,root,root)
 %dir %{_prefix}/vice
 %{_prefix}/vice/*
+%ghost %{_prefix}/vice/cache.rpmmoved
 
 %files transarc-server
 %defattr(-,root,root)
@@ -932,6 +950,10 @@ fi
 ###
 ##############################################################################
 %changelog
+* Fri Jun 05 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-3
+- Create an rpmtrans scriptlet to deal with a removing a directory where
+  a symlink will eventually be created.
+
 * Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-2
 - Include our own openafs-client.service, which fixes several startup
   issues.
