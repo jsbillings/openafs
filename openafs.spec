@@ -228,6 +228,9 @@ is completely optional, and is only necessary to support legacy
 applications and scripts that hard-code the location of AFS client
 programs.
 
+This package can cause problems on systems that already have
+directories in place before the package is installed.
+
 %package transarc-server
 Summary: OpenAFS client compatibility symlinks
 Requires: openafs = %{version}, openafs-server = %{version}
