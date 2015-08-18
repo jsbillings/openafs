@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.11.1
-%define pkgvers 1.6.11.1
+%define afsvers 1.6.14
+%define pkgvers 1.6.14
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 3
+%define pkgrel 1
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -953,6 +953,15 @@ fi
 ###
 ##############################################################################
 %changelog
+* Mon Aug 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14-1
+- Bumped to 1.6.14
+
+* Mon Jul 20 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.12-1.1
+- Replace source tarballs with ones prepared by openafs.org
+
+* Mon Jul 06 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.12-1
+- rebuilt against 1.6.12
+
 * Fri Jun 05 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-3
 - Create an rpmtrans scriptlet to deal with a removing a directory where
   a symlink will eventually be created.
