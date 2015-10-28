@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.14
+%define afsvers 1.6.14.1
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: 1.6.14
+Version: 1.6.14.1
 Release: %{pkgrel}%{?dist}
 License: IBM Public License
 URL: http://www.openafs.org
@@ -193,6 +193,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Tue Sep 22 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-1
+- Bumped to 1.6.14.1
+
 * Mon Aug 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14-1
 - Bumped to 1.6.14
 

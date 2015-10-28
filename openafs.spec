@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.14
-%define pkgvers 1.6.14
+%define afsvers 1.6.14.1
+%define pkgvers 1.6.14.1
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 1
+%define pkgrel 2
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -280,6 +280,11 @@ if [[ ! -f configure ]]; then
    sh regen.sh
 fi
 
+# Fedora 23+ won't compile with the redhat-hardened-ld
+%if 0%{?fedora} >= 23
+LDFLAGS=$( echo %__global_ldflags | sed 's!-specs=/usr/lib/rpm/redhat/redhat-hardened-ld!!'); export LDFLAGS
+%endif
+
 %configure \
        --with-afs-sysname=${sysname} \
        --disable-strip-binaries \
@@ -288,7 +293,8 @@ fi
        --with-krb5 \
        --enable-bitmap-later \
        --enable-supergroups \
-       || exit 1
+    || exit 1
+
 make
 #make -j16
 
@@ -953,6 +959,12 @@ fi
 ###
 ##############################################################################
 %changelog
+* Thu Sep 24 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-2
+- Ignore LD hardening added in Fedora 23
+
+* Tue Sep 22 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-1
+- Bumped to 1.6.14.1
+
 * Mon Aug 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14-1
 - Bumped to 1.6.14
 
