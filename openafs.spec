@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.14.1
-%define pkgvers 1.6.14.1
+%define afsvers 1.6.16
+%define pkgvers 1.6.16
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 %define pkgrel 2
@@ -959,6 +959,13 @@ fi
 ###
 ##############################################################################
 %changelog
+* Thu Dec 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-1
+- Bumped to 1.6.16
+
+* Wed Oct 28 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.15-1
+- Bumped to 1.6.15
+- Addresses CVE-2015-7762 and CVE-2015-7763
+
 * Thu Sep 24 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-2
 - Ignore LD hardening added in Fedora 23
 
