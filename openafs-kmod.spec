@@ -1,11 +1,11 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.14.1
+%define afsvers 1.6.17
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: 1.6.14.1
-Release: %{pkgrel}%{?dist}
+Version: 1.6.17
+Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d_%H.%M")}
 License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -21,6 +21,14 @@ Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
 
+# Patches
+#  From http://gerrit.openafs.org/#/c/12169/2
+Patch01:  fix-keyring-value.patch
+#  From http://gerrit.openafs.org/#/c/12170/3
+Patch02:  update-locks-api.patch
+#  From http://gerrit.openafs.org/#/c/12217/
+Patch03:  disable-splice.patch
+
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
 allowing cross-platform sharing of files among multiple computers.
@@ -30,7 +38,7 @@ administrative management.
 This package provides the kernel module for the OpenAFS client
 
 %define dkms_version %{version}-%{pkgrel}%{?dist}
-%{expand:%(sh %{SOURCE13})}
+%{expand:%(sh %{_sourcedir}/find-installed-kversion.sh)}
 %{expand:%(sh %{SOURCE14} rpmtemplate openafs %{kversion} /usr/sbin/depmod "")}
 
 %package -n dkms-openafs
@@ -78,6 +86,14 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 
+# Only apply the linux-4.4 patches if running Fedora 22 or greater
+%if 0%{?fedora} >= 22
+# Patches
+%patch01 -p1 -b .fix-keyring-value
+%patch02 -p1 -b .update-locks-api
+%patch03 -p1 -b .disable-splice
+%endif
+
 ##############################################################################
 #
 # building
@@ -90,9 +106,15 @@ case %{_arch} in
        *)                              sysname=%{_arch}_linux26     ;;
 esac
 
+%if 0%{?fedora} >= 22
+# If running fedora, force autoconf regeneration due to patches
+sh regen.sh
+%else
+# Otherwise, only regenerate if configure is missing
 if [[ ! -f configure ]]; then
    sh regen.sh
 fi
+%endif
 
 ./configure --with-afs-sysname=${sysname} \
   	--prefix=%{_prefix} \
@@ -193,6 +215,23 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Wed Mar 16 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.17-1
+- Bumped to 1.6.17
+- Also patch for 4.4 kernels in f22
+
+* Thu Mar 10 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-2
+- Added patches to allow OpenAFS to compile on 4.4 kernel, patches only
+  applied for f23 or greater
+- Added patch to disable use of splice() function for 4.4 kernel, only
+  applied for f23 or greater
+
+* Thu Dec 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-1
+- Bumped to 1.6.16
+
+* Wed Oct 28 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.15-1
+- Bumped to 1.6.15
+- Addresses CVE-2015-7762 and CVE-2015-7763
+
 * Tue Sep 22 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-1
 - Bumped to 1.6.14.1
 
