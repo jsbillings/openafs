@@ -1,11 +1,13 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.17
+%define afsvers 1.6.19
+%define PACKAGE_VERSION 1.6.19
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: 1.6.17
-Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d_%H.%M")}
+Version: %{afsvers}
+#Release: %{pkgrel}
+Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d")}
 License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -21,14 +23,6 @@ Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
 
-# Patches
-#  From http://gerrit.openafs.org/#/c/12169/2
-Patch01:  fix-keyring-value.patch
-#  From http://gerrit.openafs.org/#/c/12170/3
-Patch02:  update-locks-api.patch
-#  From http://gerrit.openafs.org/#/c/12217/
-Patch03:  disable-splice.patch
-
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
 allowing cross-platform sharing of files among multiple computers.
@@ -38,7 +32,7 @@ administrative management.
 This package provides the kernel module for the OpenAFS client
 
 %define dkms_version %{version}-%{pkgrel}%{?dist}
-%{expand:%(sh %{_sourcedir}/find-installed-kversion.sh)}
+%{expand:%(sh %{SOURCE13})}
 %{expand:%(sh %{SOURCE14} rpmtemplate openafs %{kversion} /usr/sbin/depmod "")}
 
 %package -n dkms-openafs
@@ -86,14 +80,6 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 
-# Only apply the linux-4.4 patches if running Fedora 22 or greater
-%if 0%{?fedora} >= 22
-# Patches
-%patch01 -p1 -b .fix-keyring-value
-%patch02 -p1 -b .update-locks-api
-%patch03 -p1 -b .disable-splice
-%endif
-
 ##############################################################################
 #
 # building
@@ -106,15 +92,10 @@ case %{_arch} in
        *)                              sysname=%{_arch}_linux26     ;;
 esac
 
-%if 0%{?fedora} >= 22
-# If running fedora, force autoconf regeneration due to patches
-sh regen.sh
-%else
 # Otherwise, only regenerate if configure is missing
-if [[ ! -f configure ]]; then
-   sh regen.sh
-fi
-%endif
+ if [[ ! -f configure ]]; then
+    sh regen.sh
+ fi
 
 ./configure --with-afs-sysname=${sysname} \
   	--prefix=%{_prefix} \
@@ -215,6 +196,31 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Mon Nov 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.19-1
+- Bumped to 1.6.19
+
+* Wed Jul 20 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.2-1
+- Bumped to 1.6.18.2
+
+* Tue Jul 05 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.1-2
+- Add patch for Fedora 24+ that fixes the PAGE_CACHE->PAGE rename.  See:
+  https://github.com/torvalds/linux/commit/09cbfeaf1a5a67bfb3201e0c83c810cecb2efa5a
+
+* Thu Jun 23 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.1-1
+- Bumped to 1.6.18.1, which includes patches in previous release
+
+* Mon Jun 20 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-4
+- Add patches for 4.5+ kernels for f23+, rebased on
+  openafs-stable-1_6_x branch
+
+* Mon May 9 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-2
+- Disable patch that can cause a deadlock, see
+  https://gerrit.openafs.org/#/c/12267/
+
+* Mon May 9 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-1
+- Bumped to 1.6.18
+- Also patch for 4.5 kernels in f24+
+
 * Wed Mar 16 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.17-1
 - Bumped to 1.6.17
 - Also patch for 4.4 kernels in f22

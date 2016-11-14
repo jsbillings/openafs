@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.16
-%define pkgvers 1.6.16
+%define afsvers 1.6.19
+%define pkgvers 1.6.19
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 2
+%define pkgrel 1
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -45,7 +45,7 @@ Source3: openafs-client.service
 
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
-Source20: http://dl.central.org/dl/cellservdb/CellServDB.2015-01-19
+Source20: https://www.central.org/dl/cellservdb/CellServDB.2016-01-01
 
 
 %description
@@ -335,9 +335,9 @@ install -m 755 src/packaging/RedHat/openafs-server.init $RPM_BUILD_ROOT%{initdir
 %else
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules
-install -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/openafs-client.service
+install -m 644 %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}/openafs-client.service
 install -m 755 src/packaging/RedHat/openafs-client.modules $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/modules/openafs-client.modules
-install -m 755 src/packaging/RedHat/openafs-server.service $RPM_BUILD_ROOT%{_unitdir}/openafs-server.service
+install -m 644 src/packaging/RedHat/openafs-server.service $RPM_BUILD_ROOT%{_unitdir}/openafs-server.service
 %endif
 
 
@@ -959,6 +959,19 @@ fi
 ###
 ##############################################################################
 %changelog
+* Mon Nov 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.19-1
+- Bumped to 1.6.19
+
+* Wed Jul 20 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.2-1
+- Bumped to 1.6.18.2
+
+* Mon May 9 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-1
+- Bumped to 1.6.18
+
+* Wed Mar 16 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.17-1
+- Bumped to 1.6.17
+- Changed systemd units from 0755 to 0644 permissions
+
 * Thu Dec 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-1
 - Bumped to 1.6.16
 
