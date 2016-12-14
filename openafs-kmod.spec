@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.19
-%define PACKAGE_VERSION 1.6.19
+%define afsvers 1.6.20
+%define PACKAGE_VERSION 1.6.20
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -196,6 +196,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Thu Dec 01 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20-1
+- Bumped to 1.6.20
+
 * Mon Nov 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.19-1
 - Bumped to 1.6.19
 
