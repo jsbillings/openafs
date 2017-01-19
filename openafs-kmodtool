@@ -99,7 +99,7 @@ Provides:         kernel-modules = ${kname}
 Provides:         ${kmod_name}-kmod = %{?epoch:%{epoch}:}%{version}-%{release}
 Provides:         openafs-kernel = %{PACKAGE_VERSION}
 Requires:         ${kdep}
-Requires:         ${kmod_name}-kmod-common >= %{?epoch:%{epoch}:}%{version}
+Requires:         ${kmod_name}-kmod-common >= %{PACKAGE_VERSION}
 Requires(post):   ${depmod}
 Requires(postun): ${depmod}
 Release:          %{pkgrel}.%(echo ${verrel} | tr - _)

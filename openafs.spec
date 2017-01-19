@@ -1,17 +1,15 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.20
-%define pkgvers 1.6.20
+%define afsvers 1.8.0pre1
+%define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 1
+%define pkgrel 0.pre1
 %define kmod_name openafs
+%define dkms_version %{version}-%{pkgrel}%{?dist}
 
 # Define the location of your init.d directory
 %define initdir /etc/rc.d/init.d
-
-# Define the location of the PAM security module directory
-%define pamdir /%{_lib}/security
 
 # Make sure RPM doesn't complain about installed but non-packaged files.
 #define __check_files  %{nil}
@@ -25,7 +23,7 @@ URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: OpenAFS Gatekeepers <openafs-gatekeepers@openafs.org>
 Group: Networking/Filesystems
-BuildRequires: %{?kdepend:%{kdepend}, } pam-devel, ncurses-devel, flex, bison, automake, autoconf
+BuildRequires: %{?kdepend:%{kdepend}, } ncurses-devel, flex, bison, automake, autoconf
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 BuildRequires: systemd-units
 %endif
@@ -165,20 +163,6 @@ administrative management.
 This package provides HTML documentation for OpenAFS users and system
 administrators.
 
-%package kpasswd
-Summary: OpenAFS KA kpasswd support
-Requires: openafs
-Group: Networking/Filesystems
-
-%description kpasswd
-The AFS distributed filesystem.  AFS is a distributed filesystem
-allowing cross-platform sharing of files among multiple computers.
-Facilities are provided for access control, authentication, backup and
-administrative management.
-
-This package provides the compatibility symlink for kpasswd, in case
-you are using KAserver instead of Krb5.
-
 %package krb5
 Summary: OpenAFS programs to use with krb5
 Requires: openafs = %{version}
@@ -192,7 +176,7 @@ Facilities are provided for access control, authentication, backup and
 administrative management.
 
 This package provides compatibility programs so you can use krb5
-to authenticate to AFS services, instead of using AFS's homegrown
+to authenticate to AFS services, instead of using the AFS homegrown
 krb4 lookalike services.
 
 %package compat
@@ -247,6 +231,26 @@ is completely optional, and is only necessary to support legacy
 applications and scripts that hard-code the location of AFS client
 programs.
 
+%package -n dkms-openafs
+Summary:        DKMS-ready kernel source for AFS distributed filesystem
+Group:          Development/Kernel
+Provides:       openafs-kernel = %{version}
+Provides:       openafs-kmod = %{version}
+Requires(pre):  dkms
+Requires(pre):  flex, bison, gcc
+Requires(post): dkms
+Requires:	openafs-client = %{version}
+
+%description -n dkms-openafs
+The AFS distributed filesystem.  AFS is a distributed filesystem
+allowing cross-platform sharing of files among multiple computers.
+Facilities are provided for access control, authentication, backup and
+administrative management.
+
+This package provides the source code to allow DKMS to build an
+AFS kernel module.
+
+
 ##############################################################################
 #
 # PREP
@@ -298,6 +302,9 @@ LDFLAGS=$( echo %__global_ldflags | sed 's!-specs=/usr/lib/rpm/redhat/redhat-har
 make
 #make -j16
 
+# Build the libafs tree
+make only_libafs_tree || exit 1
+
 ##############################################################################
 #
 # installation
@@ -320,9 +327,6 @@ esac
 # any user in /usr/bin
 #mv $RPM_BUILD_ROOT%{_prefix}/afs/bin/restorevol $RPM_BUILD_ROOT%{_bindir}/restorevol
 
-# Link kpasswd to kapasswd
-#ln -f $RPM_BUILD_ROOT%{_bindir}/kpasswd $RPM_BUILD_ROOT%{_bindir}/kapasswd
-
 # Copy root.client config files
 mkdir -p $RPM_BUILD_ROOT/etc/openafs
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
@@ -340,14 +344,6 @@ install -m 755 src/packaging/RedHat/openafs-client.modules $RPM_BUILD_ROOT%{_sys
 install -m 644 src/packaging/RedHat/openafs-server.service $RPM_BUILD_ROOT%{_unitdir}/openafs-server.service
 %endif
 
-
-# Move PAM modules into correct location
-mkdir -p $RPM_BUILD_ROOT%{pamdir}
-mv $RPM_BUILD_ROOT%{_libdir}/pam_afs* $RPM_BUILD_ROOT%{pamdir}
-
-# PAM symlinks
-ln -sf pam_afs.so.1 $RPM_BUILD_ROOT%{pamdir}/pam_afs.so
-ln -sf pam_afs.krb.so.1 $RPM_BUILD_ROOT%{pamdir}/pam_afs.krb.so
 
 #
 # Install DOCUMENTATION
@@ -370,9 +366,6 @@ for x in afs_ftpd afs_inetd afs_login afs_rcp afs_rlogind afs_rsh \
 	rm -f $RPM_BUILD_ROOT%{_mandir}/man1/${x}.1
 done
 
-# rename kpasswd to kapasswd
-#mv $RPM_BUILD_ROOT%{_mandir}/man1/kpasswd.1 $RPM_BUILD_ROOT%{_mandir}/man1/kapasswd.1
-
 #
 # create filelist
 #
@@ -380,9 +373,6 @@ grep -v "^#" >openafs-file-list <<EOF-openafs-file-list
 %{_bindir}/afsmonitor
 %{_bindir}/bos
 %{_bindir}/fs
-%{_bindir}/kapasswd
-%{_bindir}/klog
-%{_bindir}/klog.krb
 %{_bindir}/pagsh
 %{_bindir}/pagsh.krb
 %{_bindir}/pts
@@ -400,7 +390,6 @@ grep -v "^#" >openafs-file-list <<EOF-openafs-file-list
 %{_sbindir}/butc
 %{_sbindir}/fms
 %{_sbindir}/fstrace
-%{_sbindir}/kas
 %{_sbindir}/read_tape
 %{_sbindir}/rxdebug
 %{_sbindir}/uss
@@ -481,12 +470,6 @@ for f in 1/dlog 1/copyauth 1/dpass 1/livesys 8/rmtsysd 8/aklog_dynamic_auth 8/kd
   rm -f $RPM_BUILD_ROOT%{_mandir}/man$f.*
 done
 
-# PAM modules are doubly-installed  Remove the version we don't need
-#for f in pam_afs.krb.so.1 pam_afs.so.1 ; do
-#  rm -f $RPM_BUILD_ROOT%{_libdir}/$f
-#done
-
-#%endif
 #delete static libraries not in upstream package
 rm -f $RPM_BUILD_ROOT%{_libdir}/libjuafs.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/libuafs.a
@@ -521,6 +504,29 @@ sed -i 's!/usr/vice/cache!%{_localstatedir}/cache/openafs!' $RPM_BUILD_ROOT%{_sy
 # Set the executable bit on libraries in libdir, so rpmbuild knows to
 # create "Provides" entries in the package metadata for the libraries
 chmod +x $RPM_BUILD_ROOT%{_libdir}/*.so*
+
+#
+# install dkms source
+#
+install -d -m 755 $RPM_BUILD_ROOT%{_prefix}/src
+cp -a libafs_tree $RPM_BUILD_ROOT%{_prefix}/src/openafs-%{dkms_version}
+
+cat > $RPM_BUILD_ROOT%{_prefix}/src/openafs-%{dkms_version}/dkms.conf <<"EOF"
+
+PACKAGE_VERSION="%{dkms_version}"
+
+# Items below here should not have to change with each driver version
+PACKAGE_NAME="openafs"
+MAKE[0]='./configure --with-linux-kernel-headers=${kernel_source_dir} --with-linux-kernel-packaging && make && mv src/libafs/MODLOAD-*/openafs.ko .'
+CLEAN="make -C src/libafs clean"
+
+BUILT_MODULE_NAME[0]="openafs"
+DEST_MODULE_LOCATION[0]="/extra/openafs/"
+STRIP[0]=no
+AUTOINSTALL=yes
+
+EOF
+
 
 ##############################################################################
 ###
@@ -656,6 +662,14 @@ fi
 /sbin/chkconfig --del openafs-server >/dev/null 2>&1 || :
 %endif
 
+%post -n dkms-openafs
+dkms add -m openafs -v %{dkms_version} --rpm_safe_upgrade
+dkms build -m openafs -v %{dkms_version} --rpm_safe_upgrade
+dkms install -m openafs -v %{dkms_version} --rpm_safe_upgrade
+
+%preun -n dkms-openafs
+dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
+
 ##############################################################################
 ###
 ### file lists
@@ -668,8 +682,6 @@ fi
 %{_bindir}/afsmonitor
 %{_bindir}/bos
 %{_bindir}/fs
-%{_bindir}/klog
-%{_bindir}/klog.krb
 %{_bindir}/pagsh
 %{_bindir}/pagsh.krb
 %{_bindir}/pts
@@ -687,19 +699,18 @@ fi
 %{_sbindir}/butc
 %{_sbindir}/fms
 %{_sbindir}/fstrace
-%{_sbindir}/kas
 %{_sbindir}/read_tape
 %{_sbindir}/rxdebug
 %{_sbindir}/uss
 %{_sbindir}/vos
 %{_sbindir}/vsys
+%{_libdir}/librokenafs.so.*
+%{_libdir}/libafshcrypto.so.*
 %{_mandir}/man1/fs*.gz
 %{_mandir}/man1/pts*.gz
 %{_mandir}/man1/vos*.gz
 %{_mandir}/man1/afs.1.gz
 %{_mandir}/man1/afsmonitor.1.gz
-%{_mandir}/man1/klog.1.gz
-%{_mandir}/man1/klog.krb.1.gz
 %{_mandir}/man1/pagsh.1.gz
 %{_mandir}/man1/pagsh.krb.1.gz
 %{_mandir}/man1/rxdebug.1.gz
@@ -717,8 +728,6 @@ fi
 %{_mandir}/man5/uss_bulk.5.gz
 %{_mandir}/man8/bos*
 %{_mandir}/man8/fstrace*
-%{_mandir}/man8/kas.*
-%{_mandir}/man8/kas_*
 %{_mandir}/man1/sys.1.gz
 %{_mandir}/man8/backup*
 %{_mandir}/man5/butc.5.gz
@@ -754,10 +763,6 @@ fi
 %{_bindir}/up
 %{_sbindir}/afsd
 %{_prefix}/share/openafs/C/afszcm.cat
-%{pamdir}/pam_afs.krb.so.1
-%{pamdir}/pam_afs.krb.so
-%{pamdir}/pam_afs.so.1
-%{pamdir}/pam_afs.so
 %if 0%{?fedora} < 15 && 0%{?rhel} < 7
 %{initdir}/openafs-client
 %else
@@ -785,6 +790,7 @@ fi
 %ghost %config(noreplace) %{_sysconfdir}/openafs/BosConfig
 %ghost %config(noreplace) %{_sysconfdir}/openafs/server/rxkad.keytab
 %ghost %config(noreplace) %{_sysconfdir}/sysconfig/openafs-server
+%{_bindir}/akeyconvert
 %{_sbindir}/bosserver
 %{_sbindir}/bos_util
 %{_libexecdir}/openafs/buserver
@@ -794,9 +800,6 @@ fi
 %{_libexecdir}/openafs/davolserver
 %{_libexecdir}/openafs/fileserver
 %{_sbindir}/fssync-debug
-# Should we support KAServer?
-%{_libexecdir}/openafs/kaserver
-%{_sbindir}/ka-forwarder
 %{_sbindir}/pt_util
 %{_libexecdir}/openafs/ptserver
 %{_libexecdir}/openafs/salvager
@@ -808,7 +811,6 @@ fi
 %{_libexecdir}/openafs/vlserver
 %{_sbindir}/volinfo
 %{_libexecdir}/openafs/volserver
-%{_sbindir}/kadb_check
 %{_sbindir}/prdb_check
 %{_sbindir}/vldb_check
 %{_sbindir}/vldb_convert
@@ -819,6 +821,7 @@ fi
 %else
 %{_unitdir}/openafs-server.service
 %endif
+%{_mandir}/man3/AFS::ukernel.*
 %{_mandir}/man5/AuthLog.*
 %{_mandir}/man5/BackupLog.*
 %{_mandir}/man5/BosConfig.*
@@ -826,6 +829,7 @@ fi
 %{_mandir}/man5/FORCESALVAGE.*
 %{_mandir}/man5/FileLog.*
 %{_mandir}/man5/KeyFile.*
+%{_mandir}/man5/KeyFileExt.*
 %{_mandir}/man5/NetInfo.*
 %{_mandir}/man5/NetRestrict.*
 %{_mandir}/man5/NoAuth.*
@@ -837,23 +841,19 @@ fi
 %{_mandir}/man5/VolserLog.*
 %{_mandir}/man5/bdb.DB0.*
 %{_mandir}/man5/fms.log.*
-%{_mandir}/man5/kaserver.DB0.*
-%{_mandir}/man5/kaserverauxdb.*
 %{_mandir}/man5/krb.conf.*
 %{_mandir}/man5/krb.excl.*
 %{_mandir}/man5/prdb.DB0.*
 %{_mandir}/man5/salvage.lock.*
 %{_mandir}/man5/tapeconfig.*
 %{_mandir}/man5/vldb.DB0.*
+%{_mandir}/man8/akeyconvert.*
 %{_mandir}/man8/buserver.*
 %{_mandir}/man8/fileserver.*
 %{_mandir}/man8/dafileserver.*
-%{_mandir}/man8/dafssync-debug.*
+%{_mandir}/man8/dafssync-debug*
 %{_mandir}/man8/dasalvager.*
 %{_mandir}/man8/davolserver.*
-%{_mandir}/man8/kadb_check.*
-%{_mandir}/man8/ka-forwarder.*
-%{_mandir}/man8/kaserver.*
 %{_mandir}/man8/prdb_check.*
 %{_mandir}/man8/ptserver.*
 %{_mandir}/man8/pt_util.*
@@ -894,33 +894,28 @@ fi
 %{_bindir}/afs_compile_et
 %{_bindir}/rxgen
 %{_includedir}/afs
-%{_includedir}/des.h
-%{_includedir}/des_conf.h
-%{_includedir}/des_odd.h
-%{_includedir}/des_prototypes.h
 %{_includedir}/lock.h
 %{_includedir}/lwp.h
-%{_includedir}/mit-cpyright.h
-%{_includedir}/preempt.h
 %{_includedir}/rx
 %{_includedir}/timer.h
 %{_includedir}/ubik.h
 %{_includedir}/ubik_int.h
+%{_includedir}/opr/queue.h
 %{_libdir}/afs
-%{_libdir}/libdes.a
 %{_libdir}/liblwp.a
+%{_libdir}/libopr.a
 %{_libdir}/librx.a
 %{_libdir}/librxkad.a
 %{_libdir}/librxstat.a
 %{_libdir}/libubik.a
+%{_libdir}/librokenafs.a
+%{_libdir}/librokenafs.so
+%{_libdir}/libafshcrypto.a
+%{_libdir}/libafshcrypto.so
+%{_libdir}/libafsrfc3961.a
+%{_libdir}/libuafs_pic.a
 %{_mandir}/man1/rxgen.*
 %{_mandir}/man1/afs_compile_et.*
-
-%files kpasswd
-%defattr(-,root,root)
-%{_bindir}/kpasswd
-%{_bindir}/kpwvalid
-%{_mandir}/man1/kpasswd.1.gz
 
 %files krb5
 %defattr(-,root,root)
@@ -952,6 +947,9 @@ fi
 %{_prefix}/afs/local
 %{_prefix}/afs/logs
 
+%files -n dkms-openafs
+%defattr(-,root,root)
+%{_prefix}/src/openafs-%{dkms_version}
 
 ##############################################################################
 ###
@@ -959,6 +957,12 @@ fi
 ###
 ##############################################################################
 %changelog
+* Wed Dec 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre1
+- Building 1.8.0 pre1 alpha
+- Disable packaging of kaserver, pam_afs pam modules, kpasswd, man pages
+  and related software
+- Include dkms package (from openafs-kmod spec file)
+  
 * Thu Dec 01 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20-1
 - Bumped to 1.6.20
 
