@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
-%define pkgrel 1
-%define afsvers 1.6.20
-%define PACKAGE_VERSION 1.6.20
+%define pkgrel 2
+%define afsvers 1.6.20.1
+%define PACKAGE_VERSION 1.6.20.1
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -12,7 +12,7 @@ License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
-BuildRequires: pam-devel, flex, bison, automake, autoconf
+BuildRequires: pam-devel, flex, bison, automake, autoconf, elfutils-libelf-devel
 
 ExclusiveArch: %{ix86} x86_64
 
@@ -22,6 +22,8 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
+
+Patch00:  Linux-4.10-have_submounts-is-gone.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -79,6 +81,9 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
+
+%patch00 -p1 -b .Linux-4.10-have_submounts-is-gone
+
 
 ##############################################################################
 #
