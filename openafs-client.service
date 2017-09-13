@@ -8,6 +8,7 @@ Before=remote-fs.target
 Type=forking
 RemainAfterExit=yes
 EnvironmentFile=/etc/sysconfig/openafs
+ExecStartPre=/bin/bash -c "fs sysname > /dev/null 2>/dev/null; test $? -ne 0 || (echo AFS client appears to be running -- not starting && exit 1)"
 ExecStartPre=/bin/sed -n 'w/etc/openafs/CellServDB' /etc/openafs/CellServDB.local /etc/openafs/CellServDB.dist
 ExecStartPre=/bin/chmod 0644 /etc/openafs/CellServDB
 ExecStartPre=/sbin/modprobe openafs

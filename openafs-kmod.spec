@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
-%define pkgrel 2
-%define afsvers 1.6.20.1
-%define PACKAGE_VERSION 1.6.20.1
+%define pkgrel 1
+%define afsvers 1.6.21
+%define PACKAGE_VERSION 1.6.21
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -22,8 +22,6 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
-
-Patch00:  Linux-4.10-have_submounts-is-gone.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -81,9 +79,6 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
-
-%patch00 -p1 -b .Linux-4.10-have_submounts-is-gone
-
 
 ##############################################################################
 #
@@ -143,7 +138,6 @@ cp %{SOURCE10} %{SOURCE11} .
 #
 install -d -m 755 $RPM_BUILD_ROOT%{_prefix}/src
 cp -a libafs_tree $RPM_BUILD_ROOT%{_prefix}/src/openafs-%{dkms_version}
-
 cat > $RPM_BUILD_ROOT%{_prefix}/src/openafs-%{dkms_version}/dkms.conf <<"EOF"
 
 PACKAGE_VERSION="%{dkms_version}"
@@ -201,6 +195,15 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Tue Jul 11 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.21-1
+- Bumped to 1.6.21
+
+* Thu Jun 1 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20.2-2
+- Added workaround to gcc7 bug in ./configure conftest
+
+* Fri Apr 14 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20.2-1
+- Bumped to 1.6.20.2
+
 * Thu Dec 01 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20-1
 - Bumped to 1.6.20
 

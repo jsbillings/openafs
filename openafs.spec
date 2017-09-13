@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.20.1
-%define pkgvers 1.6.20.1
+%define afsvers 1.6.21
+%define pkgvers 1.6.21
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 %define pkgrel 1
@@ -959,6 +959,9 @@ fi
 ###
 ##############################################################################
 %changelog
+* Fri Apr 14 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20.2-1
+- Bumped to 1.6.20.2
+
 * Thu Dec 01 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20-1
 - Bumped to 1.6.20
 
