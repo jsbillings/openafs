@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.8.0pre1
+%define afsvers 1.8.0pre2
 %define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 0.pre1
+%define pkgrel 0.pre2
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -833,6 +833,7 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %{_mandir}/man5/NetInfo.*
 %{_mandir}/man5/NetRestrict.*
 %{_mandir}/man5/NoAuth.*
+%{_mandir}/man5/PtLog.*
 %{_mandir}/man5/SALVAGE.fs.*
 %{_mandir}/man5/SalvageLog.*
 %{_mandir}/man5/sysid.*
