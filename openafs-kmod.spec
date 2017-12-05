@@ -1,6 +1,6 @@
 # Openafs Spec $Revision$
-%define pkgrel 0.pre2
-%define afsvers 1.8.0pre2
+%define pkgrel 0.pre3
+%define afsvers 1.8.0pre3
 %define PACKAGE_VERSION 1.8.0
 
 Summary: OpenAFS distributed filesystem

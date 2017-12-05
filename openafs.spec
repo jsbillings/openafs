@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.8.0pre2
+%define afsvers 1.8.0pre3
 %define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 0.pre2
+%define pkgrel 0.pre3
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -958,6 +958,10 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Tue Dec 5 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre3
+- Building 1.8.0 pre3
+
+- Disable packaging of kaserver, pam_afs pam modules, kpasswd, man pages
 * Wed Dec 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre1
 - Building 1.8.0 pre1 alpha
 - Disable packaging of kaserver, pam_afs pam modules, kpasswd, man pages
