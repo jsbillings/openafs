@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.6.21
-%define pkgvers 1.6.21
+%define afsvers 1.6.22
+%define pkgvers 1.6.22
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 2
+%define pkgrel 1
 %define kmod_name openafs
 
 # Define the location of your init.d directory
@@ -45,9 +45,8 @@ Source3: openafs-client.service
 
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
-Source20: https://www.central.org/dl/cellservdb/CellServDB.2016-01-01
+Source20: https://www.central.org/dl/cellservdb/CellServDB.2017-03-14
 
-# From https://gerrit.openafs.org/#/c/12724/1
 Patch00:  0001-vol-add-missing-include-of-stdint.h-to-volinodes.h.patch
 
 
@@ -260,7 +259,7 @@ programs.
 # Install OpenAFS src and doc
 %setup -q -b 1 -n %{srcdir}
 
-%patch00 -p1 -b .volinodeshfix
+%patch00 -p1 -b vol-add-missing-include
 
 ##############################################################################
 #
@@ -964,6 +963,13 @@ fi
 ###
 ##############################################################################
 %changelog
+* Tue Dec 5 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.22-1
+- Bumped to 1.6.22
+
+* Fri Sep 22 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.21.1-1
+- Bumped to 1.6.21.1
+- Update CellServDB to CellServDB.2017-03-14
+
 * Mon Sep 18 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.21-2
 - Added patch to allow building on Fedora 27
 

@@ -1,7 +1,7 @@
 # Openafs Spec $Revision$
 %define pkgrel 1
-%define afsvers 1.6.21
-%define PACKAGE_VERSION 1.6.21
+%define afsvers 1.6.22
+%define PACKAGE_VERSION 1.6.22
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -22,6 +22,11 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
+
+# Patches
+## Patch to prevent getcwd() ENOENT after shakeloose
+## See: https://gerrit.openafs.org/#/c/12796/
+Patch00:  prevent-getcwd-ENOENT-after-shakeloose.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -79,6 +84,11 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
+
+# Patching
+%if 0%{?rhel} == 7
+%patch00 -p1 -b .prevent-getcwd-enoent
+%endif
 
 ##############################################################################
 #
@@ -195,6 +205,14 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Tue Dec 5 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.22-1
+- Bumped to 1.6.22
+
+* Mon Dec 4 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.21.1-2
+- Added patch from https://gerrit.openafs.org/#/c/12796/ which prevents
+  getcwd() ENOENT after shakeloose
+- Bumped to 1.6.21.1
+
 * Tue Jul 11 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.21-1
 - Bumped to 1.6.21
 
