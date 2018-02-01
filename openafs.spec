@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.8.0pre3
+%define afsvers 1.8.0pre4
 %define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 0.pre3
+%define pkgrel 0.pre4
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -23,7 +23,7 @@ URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Packager: OpenAFS Gatekeepers <openafs-gatekeepers@openafs.org>
 Group: Networking/Filesystems
-BuildRequires: %{?kdepend:%{kdepend}, } ncurses-devel, flex, bison, automake, autoconf
+BuildRequires: %{?kdepend:%{kdepend}, } ncurses-devel, flex, bison, automake, autoconf, libtool
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
 BuildRequires: systemd-units
 %endif
@@ -281,6 +281,7 @@ KRB5_CONFIG="%{krb5config}"
 export KRB5_CONFIG
 
 if [[ ! -f configure ]]; then
+   echo %{afsvers} > .version
    sh regen.sh
 fi
 
@@ -958,6 +959,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Fri Jan 5 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre4
+- Building 1.8.0 pre4
+
 * Tue Dec 5 2017 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre3
 - Building 1.8.0 pre3
 

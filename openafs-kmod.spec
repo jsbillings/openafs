@@ -1,6 +1,6 @@
 # Openafs Spec $Revision$
-%define pkgrel 0.pre3
-%define afsvers 1.8.0pre3
+%define pkgrel 0.pre4
+%define afsvers 1.8.0pre4
 %define PACKAGE_VERSION 1.8.0
 
 Summary: OpenAFS distributed filesystem
@@ -12,7 +12,7 @@ License: IBM Public License
 URL: http://www.openafs.org
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
-BuildRequires: flex, bison, automake, autoconf, krb5-devel
+BuildRequires: flex, bison, automake, autoconf, krb5-devel, libtool, elfutils-libelf-devel
 
 ExclusiveArch: %{ix86} x86_64
 
@@ -61,6 +61,7 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 
+
 ##############################################################################
 #
 # building
@@ -75,6 +76,7 @@ esac
 
 # Otherwise, only regenerate if configure is missing
  if [[ ! -f configure ]]; then
+    echo %{afsvers} > .version
     sh regen.sh
  fi
 
@@ -136,6 +138,9 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
+* Fri Jan 05 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre4
+- Building 1.8.0 pre4
+
 * Wed Dec 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre1
 - Building 1.8.0 pre1 alpha
 - Move dkms package into openafs spec file
