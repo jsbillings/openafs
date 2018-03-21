@@ -1,10 +1,10 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.8.0pre4
+%define afsvers 1.8.0pre5
 %define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 0.pre4
+%define pkgrel 0.pre5
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 

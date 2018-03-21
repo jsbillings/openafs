@@ -1,6 +1,6 @@
 # Openafs Spec $Revision$
-%define pkgrel 0.pre4
-%define afsvers 1.8.0pre4
+%define pkgrel 0.pre5.1
+%define afsvers 1.8.0pre5
 %define PACKAGE_VERSION 1.8.0
 
 Summary: OpenAFS distributed filesystem
@@ -22,6 +22,8 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
+
+Patch0:   LINUX-RH-7.5-ENOTDIR.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -60,6 +62,8 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
+
+%patch0 -p1 -b .enotdirfix
 
 
 ##############################################################################
