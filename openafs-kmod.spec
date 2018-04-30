@@ -1,12 +1,16 @@
 # Openafs Spec $Revision$
-%define pkgrel 0.pre5.1
-%define afsvers 1.8.0pre5
+#define afsvers 1.8.0pre5
+#define pkgrel 0.pre5.1
+%define afsvers 1.8.0
+%define pkgrel 1
 %define PACKAGE_VERSION 1.8.0
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
 Version: %{afsvers}
+# Required for CentOS CBS, doesn't support release that has the date encoded
 #Release: %{pkgrel}
+# Encodes the date in the release, so you can rebuild it on a different day and get a different release (for new kernels)
 Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d")}
 License: IBM Public License
 URL: http://www.openafs.org
@@ -22,8 +26,6 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
-
-Patch0:   LINUX-RH-7.5-ENOTDIR.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -62,8 +64,6 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
-
-%patch0 -p1 -b .enotdirfix
 
 
 ##############################################################################
@@ -142,6 +142,10 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
+%changelog
+* Fri Apr 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-1
+- Building 1.8.0 final release
+
 * Fri Jan 05 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre4
 - Building 1.8.0 pre4
 

@@ -1,10 +1,12 @@
 # Openafs Spec $Revision$
 
-%define afsvers 1.8.0pre5
+#define afsvers 1.8.0pre5
+%define afsvers 1.8.0
 %define pkgvers 1.8.0
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-%define pkgrel 0.pre5
+#define pkgrel 0.pre5
+%define pkgrel 1
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -43,7 +45,7 @@ Source3: openafs-client.service
 
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
-Source20: https://www.central.org/dl/cellservdb/CellServDB.2016-01-01
+Source20: https://www.central.org/dl/cellservdb/CellServDB.2017-03-14
 
 
 %description
@@ -959,6 +961,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Fri Apr 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-1
+- Building 1.8.0 final release
+
 * Fri Jan 5 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre4
 - Building 1.8.0 pre4
 
