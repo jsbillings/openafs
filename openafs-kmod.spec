@@ -2,7 +2,7 @@
 #define afsvers 1.8.0pre5
 #define pkgrel 0.pre5.1
 %define afsvers 1.8.0
-%define pkgrel 1
+%define pkgrel 2
 %define PACKAGE_VERSION 1.8.0
 
 Summary: OpenAFS distributed filesystem
@@ -26,6 +26,9 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
+
+# https://gerrit.openafs.org/#/c/13090/
+Patch00: afs-fix-broken-volume-callbacks.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -65,6 +68,8 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 
+# Fix bug in 1.8.0
+%patch00 -p1 -b .afs-fix-broken-volume-callbacks
 
 ##############################################################################
 #
@@ -142,7 +147,10 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
-%changelog
+* Mon Jun 04 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-2
+- Adding patch from https://gerrit.openafs.org/#/c/13090/ to fix cache
+  manager errors
+
 * Fri Apr 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-1
 - Building 1.8.0 final release
 
