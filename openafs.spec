@@ -1,12 +1,12 @@
 # Openafs Spec $Revision$
 
 #define afsvers 1.8.0pre5
-%define afsvers 1.8.0
-%define pkgvers 1.8.0
+%define afsvers 1.8.2
+%define pkgvers 1.8.2
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 #define pkgrel 0.pre5
-%define pkgrel 2
+%define pkgrel 1
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -45,10 +45,7 @@ Source3: openafs-client.service
 
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
-Source20: https://www.central.org/dl/cellservdb/CellServDB.2017-03-14
-
-# https://gerrit.openafs.org/#/c/13090/
-Patch00: afs-fix-broken-volume-callbacks.patch
+Source20: https://www.central.org/dl/cellservdb/CellServDB.2018-05-14
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -264,9 +261,6 @@ AFS kernel module.
 %prep
 # Install OpenAFS src and doc
 %setup -q -b 1 -n %{srcdir}
-
-# Fix bug in 1.8.0
-%patch00 -p1 -b .afs-fix-broken-volume-callbacks
 
 ##############################################################################
 #
@@ -910,6 +904,7 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %{_includedir}/ubik.h
 %{_includedir}/ubik_int.h
 %{_includedir}/opr/queue.h
+%{_includedir}/opr/lock.h
 %{_libdir}/afs
 %{_libdir}/liblwp.a
 %{_libdir}/libopr.a
