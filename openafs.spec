@@ -47,6 +47,9 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source20: https://www.central.org/dl/cellservdb/CellServDB.2018-05-14
 
+# Patches
+Patch00:  butc-butb-errors.patch
+
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
 allowing cross-platform sharing of files among multiple computers.
@@ -261,6 +264,8 @@ AFS kernel module.
 %prep
 # Install OpenAFS src and doc
 %setup -q -b 1 -n %{srcdir}
+
+%patch00 -p1 -b .butc-butb-errors
 
 ##############################################################################
 #
@@ -961,6 +966,11 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Thu Sep 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-1
+- Building 1.8.2
+- Add patches to fix bugs introduced in OPENAFS-SA-2018-001 and
+  OPENAFS-SA-2018-003, one of which led to compile errors.
+
 * Fri Apr 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-1
 - Building 1.8.0 final release
 

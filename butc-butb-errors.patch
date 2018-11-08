@@ -1,0 +1,75 @@
+From 91bab84e7a3b7de2591c475ba4912b0db8899f05 Mon Sep 17 00:00:00 2001
+From: Mark Vitale <mvitale@sinenomine.net>
+Date: Tue, 11 Sep 2018 16:29:59 -0400
+Subject: [PATCH 1/2] butc: repair build error
+
+Commit c43169fd36348783b1a5a55c5bb05317e86eef82 introduced a build error
+by invoking TLog with an extraneous set of internal parentheses.
+
+Remove the offending parentheses.
+
+Change-Id: Ibc52501b01ecbe9f86262566446d63e66486272f
+Reviewed-on: https://gerrit.openafs.org/13311
+Tested-by: BuildBot <buildbot@rampaginggeek.com>
+Reviewed-by: Benjamin Kaduk <kaduk@mit.edu>
+---
+ src/butc/tcmain.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/butc/tcmain.c b/src/butc/tcmain.c
+index c5399396e..cbd135b09 100644
+--- a/src/butc/tcmain.c
++++ b/src/butc/tcmain.c
+@@ -835,8 +835,8 @@ tc_IsLocalRealmMatch(void *rock, char *name, char *inst, char *cell)
+ 
+     code = afsconf_IsLocalRealmMatch(dir, &islocal, name, inst, cell);
+     if (code) {
+-	TLog(0, ("Failed local realm check; code=%d, name=%s, inst=%s, cell=%s\n",
+-		 code, name, inst, cell));
++	TLog(0, "Failed local realm check; code=%d, name=%s, inst=%s, cell=%s\n",
++		 code, name, inst, cell);
+     }
+     return islocal;
+ }
+-- 
+2.17.1
+
+
+From 2d8045d67686fbb80696b47b4a60e48e7e74fec9 Mon Sep 17 00:00:00 2001
+From: Mark Vitale <mvitale@sinenomine.net>
+Date: Tue, 11 Sep 2018 15:59:41 -0400
+Subject: [PATCH 2/2] budb: SBUDB_FindLatestDump should check result of
+ FillDumpEntry
+
+FillDumpEntry may return an error, but FindLatestDump doesn't check its
+result.  Therefore, SBUDB_FindLatestDump may return invalid results.
+
+Instead, check the return code from FillDumpEntry and abort the call if
+it fails.
+
+Change-Id: If0b44ba2a12a76511129d77110ef669b00780ff0
+Reviewed-on: https://gerrit.openafs.org/13312
+Tested-by: BuildBot <buildbot@rampaginggeek.com>
+Reviewed-by: Benjamin Kaduk <kaduk@mit.edu>
+---
+ src/budb/procs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/budb/procs.c b/src/budb/procs.c
+index f976ff3aa..cf355762e 100644
+--- a/src/budb/procs.c
++++ b/src/budb/procs.c
+@@ -2230,7 +2230,9 @@ FindLatestDump(struct rx_call *call, char *vsname, char *dumpPath,
+ 
+   finished:
+     /* return the dump found */
+-    FillDumpEntry(ut, retdbaddr, dumpentry);
++    eval = FillDumpEntry(ut, retdbaddr, dumpentry);
++    if (eval)
++	ABORT(eval);
+ 
+     code = ubik_EndTrans(ut);
+     return (code);
+-- 
+2.17.1
+

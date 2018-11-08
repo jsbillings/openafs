@@ -9,7 +9,7 @@ Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
 Version: %{afsvers}
 # Required for CentOS CBS, doesn't support release that has the date encoded
-#Release: %{pkgrel}
+# Release: %{pkgrel}
 # Encodes the date in the release, so you can rebuild it on a different day and get a different release (for new kernels)
 Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d")}
 License: IBM Public License
