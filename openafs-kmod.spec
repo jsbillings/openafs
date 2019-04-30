@@ -1,15 +1,15 @@
 # Openafs Spec $Revision$
-#define afsvers 1.8.0pre5
-#define pkgrel 0.pre5.1
-%define afsvers 1.8.2
+%define PACKAGE_VERSION 1.8.3
+#define afsvers 1.8.3pre1
+#define pkgrel 0.pre1
+%define afsvers 1.8.3
 %define pkgrel 1
-%define PACKAGE_VERSION 1.8.2
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
-Version: %{afsvers}
+Version: %{PACKAGE_VERSION}
 # Required for CentOS CBS, doesn't support release that has the date encoded
-# Release: %{pkgrel}
+#Release: %{pkgrel}
 # Encodes the date in the release, so you can rebuild it on a different day and get a different release (for new kernels)
 Release: %{pkgrel}.%{expand:%(date +"%Y.%m.%d")}
 License: IBM Public License
@@ -78,10 +78,10 @@ case %{_arch} in
 esac
 
 # Otherwise, only regenerate if configure is missing
- if [[ ! -f configure ]]; then
+# if [[ ! -f configure ]]; then
     echo %{afsvers} > .version
     sh regen.sh
- fi
+# fi
 
 ./configure --with-afs-sysname=${sysname} \
   	--prefix=%{_prefix} \
@@ -141,6 +141,15 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
+* Wed Mar 20 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.3-0pre1
+- Building 1.8.3pre1
+
+* Tue Dec 04 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-2
+- Bumped release to make sure it is installed on RHEL/CentOS 7.6
+
+* Thu Sep 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-1
+- Building 1.8.2
+
 * Mon Jun 04 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-2
 - Adding patch from https://gerrit.openafs.org/#/c/13090/ to fix cache
   manager errors

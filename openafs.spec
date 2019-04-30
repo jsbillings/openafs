@@ -1,11 +1,12 @@
 # Openafs Spec $Revision$
 
 #define afsvers 1.8.0pre5
-%define afsvers 1.8.2
-%define pkgvers 1.8.2
+#define afsvers 1.8.2
+%define afsvers 1.8.3
+%define pkgvers 1.8.3
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-#define pkgrel 0.pre5
+#define pkgrel 0.pre1
 %define pkgrel 1
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
@@ -46,9 +47,15 @@ Source3: openafs-client.service
 Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source20: https://www.central.org/dl/cellservdb/CellServDB.2018-05-14
-
-# Patches
-Patch00:  butc-butb-errors.patch
+# firewalld service devinitions
+Source21: afs3-bos.xml
+Source22: afs3-callback.xml
+Source23: afs3-fileserver.xml
+Source24: afs3-prserver.xml
+Source25: afs3-rmtsys.xml
+Source26: afs3-update.xml
+Source27: afs3-vlserver.xml
+Source28: afs3-volser.xml
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -235,13 +242,45 @@ is completely optional, and is only necessary to support legacy
 applications and scripts that hard-code the location of AFS client
 programs.
 
+%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+%package client-firewalld
+Summary: OpenAFS server firewalld configuration for a client
+Requires: openafs = %{version}, openafs-client = %{version}, firewalld-filesystem
+Requires(post): firewalld-filesystem
+Group: Networking/Filesystems
+
+%description client-firewalld
+The AFS distributed filesystem.  AFS is a distributed filesystem
+allowing cross-platform sharing of files among multiple computers.
+Facilities are provided for access control, authentication, backup and
+administrative management.
+
+This package provides the service definitions to use in a firewalld
+setup for an OpenAFS client.
+
+%package server-firewalld
+Summary: OpenAFS server firewalld configuration for a server
+Requires: openafs = %{version}, openafs-server = %{version}, firewalld-filesystem
+Requires(post): firewalld-filesystem
+Group: Networking/Filesystems
+
+%description server-firewalld
+The AFS distributed filesystem.  AFS is a distributed filesystem
+allowing cross-platform sharing of files among multiple computers.
+Facilities are provided for access control, authentication, backup and
+administrative management.
+
+This package provides the service definitions to use in a firewalld
+setup for an OpenAFS server.
+%endif
+
 %package -n dkms-openafs
 Summary:        DKMS-ready kernel source for AFS distributed filesystem
 Group:          Development/Kernel
 Provides:       openafs-kernel = %{version}
 Provides:       openafs-kmod = %{version}
 Requires(pre):  dkms
-Requires(pre):  flex, bison, gcc
+Requires(pre):  flex, bison, gcc, make
 Requires(post): dkms
 Requires:	openafs-client = %{version}
 
@@ -265,8 +304,6 @@ AFS kernel module.
 # Install OpenAFS src and doc
 %setup -q -b 1 -n %{srcdir}
 
-%patch00 -p1 -b .butc-butb-errors
-
 ##############################################################################
 #
 # building
@@ -286,10 +323,10 @@ CFLAGS="$RPM_OPT_FLAGS"; export CFLAGS
 KRB5_CONFIG="%{krb5config}"
 export KRB5_CONFIG
 
-if [[ ! -f configure ]]; then
+#if [[ ! -f configure ]]; then
    echo %{afsvers} > .version
    sh regen.sh
-fi
+#fi
 
 # Fedora 23+ won't compile with the redhat-hardened-ld
 %if 0%{?fedora} >= 23
@@ -512,6 +549,19 @@ sed -i 's!/usr/vice/cache!%{_localstatedir}/cache/openafs!' $RPM_BUILD_ROOT%{_sy
 # create "Provides" entries in the package metadata for the libraries
 chmod +x $RPM_BUILD_ROOT%{_libdir}/*.so*
 
+%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+# Set up firewalld files
+install -d -m 755 %{buildroot}%{_prefix}/lib/firewalld/services
+install -p -m 644 %SOURCE21 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-bos.xml
+install -p -m 644 %SOURCE22 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-callback.xml
+install -p -m 644 %SOURCE23 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-fileserver.xml
+install -p -m 644 %SOURCE24 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-prserver.xml
+install -p -m 644 %SOURCE25 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-rmtsys.xml
+install -p -m 644 %SOURCE26 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-update.xml
+install -p -m 644 %SOURCE27 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-vlserver.xml
+install -p -m 644 %SOURCE28 %{buildroot}%{_prefix}/lib/firewalld/services/afs3-volser.xml
+%endif
+
 #
 # install dkms source
 #
@@ -528,9 +578,10 @@ MAKE[0]='./configure --with-linux-kernel-headers=${kernel_source_dir} --with-lin
 CLEAN="make -C src/libafs clean"
 
 BUILT_MODULE_NAME[0]="openafs"
-DEST_MODULE_LOCATION[0]="/extra/openafs/"
+DEST_MODULE_LOCATION[0]="/extra/$PACKAGE_NAME/"
 STRIP[0]=no
 AUTOINSTALL=yes
+NO_WEAK_MODULES="true"
 
 EOF
 
@@ -667,6 +718,14 @@ fi
 
 # Run this because the SysV package being removed won't do it
 /sbin/chkconfig --del openafs-server >/dev/null 2>&1 || :
+%endif
+
+%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+%post client-firewalld
+%firewalld_reload
+
+%post server-firewalld
+%firewalld_reload
 %endif
 
 %post -n dkms-openafs
@@ -956,6 +1015,22 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %{_prefix}/afs/local
 %{_prefix}/afs/logs
 
+%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+%files client-firewalld
+%defattr(-,root,root)
+%{_prefix}/lib/firewalld/services/afs3-callback.xml
+%{_prefix}/lib/firewalld/services/afs3-rmtsys.xml
+
+%files server-firewalld
+%defattr(-,root,root)
+%{_prefix}/lib/firewalld/services/afs3-bos.xml
+%{_prefix}/lib/firewalld/services/afs3-fileserver.xml
+%{_prefix}/lib/firewalld/services/afs3-prserver.xml
+%{_prefix}/lib/firewalld/services/afs3-update.xml
+%{_prefix}/lib/firewalld/services/afs3-vlserver.xml
+%{_prefix}/lib/firewalld/services/afs3-volser.xml
+%endif
+
 %files -n dkms-openafs
 %defattr(-,root,root)
 %{_prefix}/src/openafs-%{dkms_version}
@@ -966,6 +1041,17 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Wed Mar 20 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.3-0.pre1
+- Packaged version 1.8.3pre1
+- Add 'make' as a dependency for dkms-openafs
+
+* Mon Feb 11 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-3
+- Add firewalld subpackages to define service ports
+
+* Wed Jan 23 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-2
+- Add patches to address changes in linux 4.20 kernels
+- rebuild autoconf due to patches
+
 * Thu Sep 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-1
 - Building 1.8.2
 - Add patches to fix bugs introduced in OPENAFS-SA-2018-001 and
