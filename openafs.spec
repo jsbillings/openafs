@@ -27,7 +27,7 @@ Packager: OpenAFS Gatekeepers <openafs-gatekeepers@openafs.org>
 Group: Networking/Filesystems
 BuildRequires: %{?kdepend:%{kdepend}, } ncurses-devel, flex, bison, automake, autoconf, libtool
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
-BuildRequires: systemd-units
+BuildRequires: systemd-units firewalld-filesystem
 %endif
 %if 0%{?fedora} >= 15 || 0%{?rhel} >= 6
 BuildRequires: perl-devel
