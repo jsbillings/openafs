@@ -1,8 +1,8 @@
 # Openafs Spec $Revision$
-%define PACKAGE_VERSION 1.8.6
+%define PACKAGE_VERSION 1.8.7
 #define afsvers 1.8.4pre2
 #define pkgrel 0.pre2
-%define afsvers 1.8.6
+%define afsvers 1.8.7
 %define pkgrel 1
 
 Summary: OpenAFS distributed filesystem
@@ -18,7 +18,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Group: Networking/Filesystems
 BuildRequires: flex, bison, automake, autoconf, krb5-devel, libtool, elfutils-libelf-devel
 
-ExclusiveArch: %{ix86} x86_64
+ExclusiveArch: %{ix86} x86_64 aarch64
 
 Source0: http://www.openafs.org/dl/openafs/%{afsvers}/openafs-%{afsvers}-src.tar.bz2
 
@@ -26,6 +26,9 @@ Source10: http://www.openafs.org/dl/openafs/%{afsvers}/RELNOTES-%{afsvers}
 Source11: http://www.openafs.org/dl/openafs/%{afsvers}/ChangeLog
 Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
+
+# Local patches
+# none
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -64,6 +67,8 @@ This package provides the documentation for the AFS kernel module.
 echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
+# Patches
+# none
 
 ##############################################################################
 #
@@ -141,6 +146,13 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
+* Fri Jan 15 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.7-1
+- Bump to 1.8.7
+- Remove patch for rx-nextcid since it is included in this release
+
+* Thu Jan 14 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.6-2
+- Add Patches to fix rx-nextcid timestamp bug
+
 * Mon Nov 09 2020 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.6-1
 - Bump to 1.8.6
 

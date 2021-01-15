@@ -1,8 +1,8 @@
 # Openafs Spec $Revision$
 
 #define afsvers 1.8.6pre3
-%define afsvers 1.8.6
-%define pkgvers 1.8.6
+%define afsvers 1.8.7
+%define pkgvers 1.8.7
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 #define pkgrel 0.pre3
@@ -1048,6 +1048,13 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Fri Jan 15 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.7-1
+- Bump to 1.8.7
+- Remove patch for rx-nextcid since it is included in this release
+
+* Thu Jan 14 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.6-2
+- Add Patches to fix rx-nextcid timestamp bug
+
 * Thu Oct 24 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.5-1
 - Bump to 1.8.5
 - Addresses OPENAFS-SA-2019-001, OPENAFS-SA-2019-002 and OPENAFS-SA-2019-003
