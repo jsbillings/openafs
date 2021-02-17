@@ -79,6 +79,7 @@ echo '%kversion'
 case %{_arch} in
        x86_64)                         sysname=amd64_linux26        ;;
        i386|i486|i586|i686|athlon)     sysname=i386_linux26         ;;
+       aarch64)                        sysname=arm64_linux26        ;;
        *)                              sysname=%{_arch}_linux26     ;;
 esac
 
