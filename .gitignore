@@ -1,2 +1,6 @@
 *~
 rpmbuild
+openafs/ChangeLog
+openafs-kmod/ChangeLog
+openafs/RELNOTES-*
+openafs-kmod/RELNOTES-*
