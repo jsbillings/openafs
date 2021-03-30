@@ -6,7 +6,7 @@
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
 #define pkgrel 0.pre3
-%define pkgrel 1
+%define pkgrel 2
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -864,6 +864,7 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %ghost %config(noreplace) %{_sysconfdir}/openafs/server/rxkad.keytab
 %ghost %config(noreplace) %{_sysconfdir}/sysconfig/openafs-server
 %{_bindir}/akeyconvert
+%{_bindir}/asetkey
 %{_sbindir}/bosserver
 %{_sbindir}/bos_util
 %{_libexecdir}/openafs/buserver
@@ -922,6 +923,7 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %{_mandir}/man5/tapeconfig.*
 %{_mandir}/man5/vldb.DB0.*
 %{_mandir}/man8/akeyconvert.*
+%{_mandir}/man8/asetkey.*
 %{_mandir}/man8/buserver.*
 %{_mandir}/man8/fileserver.*
 %{_mandir}/man8/dafileserver.*
@@ -996,10 +998,8 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 %defattr(-,root,root)
 %{_bindir}/aklog
 %{_bindir}/klog.krb5
-%{_bindir}/asetkey
 %{_mandir}/man1/aklog.*
 %{_mandir}/man1/klog.krb5.1.gz
-%{_mandir}/man8/asetkey.*
 
 %files compat
 %defattr(-,root,root)
@@ -1048,6 +1048,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Tue Mar 30 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.7-2
+- move asetkey into openafs-server package
+
 * Fri Jan 15 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.7-1
 - Bump to 1.8.7
 - Remove patch for rx-nextcid since it is included in this release
