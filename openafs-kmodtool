@@ -78,6 +78,7 @@ get_rpmtemplate ()
         *.el[6-9]*)
 	       kdep="kernel-%{_target_cpu} = ${verrel}${variant}"     ;;
         *.EL*) kdep="kernel${dashvariant}-%{_target_cpu} = ${verrel}" ;;
+        *.fc[2-9][0-9]*) kdep="kernel = ${verrel}" ;;
         *)     kdep="kernel-%{_target_cpu} = ${verrel}${variant}"     ;;
     esac
     case "$verrel" in

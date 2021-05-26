@@ -3,7 +3,7 @@
 #define afsvers 1.8.4pre2
 #define pkgrel 0.pre2
 %define afsvers 1.8.7
-%define pkgrel 1
+%define pkgrel 3
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -28,7 +28,8 @@ Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
 
 # Local patches
-# none
+Patch000: LINUX-Return-errors-in-our-d_revalidate.patch
+Patch001: LINUX-5.8-do-not-set-name-field-in-backing_dev_info.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -68,7 +69,8 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 # Patches
-# none
+%patch000 -p1 -b .Properly-revert-creds-in-osi_UFSTruncate
+%patch001 -p1 -b .do-not-set-name-field-in-backing_dev_info
 
 ##############################################################################
 #
@@ -147,109 +149,113 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
-* Fri Jan 15 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.7-1
+* Tue May 25 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.7-3
+- Add patch to let kernel module build for RHEL8.4
+  (https://gerrit.openafs.org/#/c/14268/)
+
+* Fri Jan 15 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.7-1
 - Bump to 1.8.7
 - Remove patch for rx-nextcid since it is included in this release
 
-* Thu Jan 14 2021 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.6-2
+* Thu Jan 14 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.6-2
 - Add Patches to fix rx-nextcid timestamp bug
 
-* Mon Nov 09 2020 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.6-1
+* Mon Nov 09 2020 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.6-1
 - Bump to 1.8.6
 
-* Thu Oct 24 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.5-1
+* Thu Oct 24 2019 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.5-1
 - Bump to 1.8.5
 - Addresses OPENAFS-SA-2019-001, OPENAFS-SA-2019-002 and OPENAFS-SA-2019-003
 
-* Mon Oct 07 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.4-1
+* Mon Oct 07 2019 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.4-1
 - Bump to 1.8.4
 
-* Wed Mar 20 2019 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.3-0pre1
+* Wed Mar 20 2019 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.3-0pre1
 - Building 1.8.3pre1
 
-* Tue Dec 04 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-2
+* Tue Dec 04 2018 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.2-2
 - Bumped release to make sure it is installed on RHEL/CentOS 7.6
 
-* Thu Sep 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.2-1
+* Thu Sep 13 2018 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.2-1
 - Building 1.8.2
 
-* Mon Jun 04 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-2
+* Mon Jun 04 2018 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.0-2
 - Adding patch from https://gerrit.openafs.org/#/c/13090/ to fix cache
   manager errors
 
-* Fri Apr 13 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-1
+* Fri Apr 13 2018 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.0-1
 - Building 1.8.0 final release
 
-* Fri Jan 05 2018 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre4
+* Fri Jan 05 2018 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.0-0.pre4
 - Building 1.8.0 pre4
 
-* Wed Dec 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.8.0-0.pre1
+* Wed Dec 14 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.0-0.pre1
 - Building 1.8.0 pre1 alpha
 - Move dkms package into openafs spec file
 
-* Thu Dec 01 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.20-1
+* Thu Dec 01 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.20-1
 - Bumped to 1.6.20
 
-* Mon Nov 14 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.19-1
+* Mon Nov 14 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.19-1
 - Bumped to 1.6.19
 
-* Wed Jul 20 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.2-1
+* Wed Jul 20 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18.2-1
 - Bumped to 1.6.18.2
 
-* Tue Jul 05 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.1-2
+* Tue Jul 05 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18.1-2
 - Add patch for Fedora 24+ that fixes the PAGE_CACHE->PAGE rename.  See:
   https://github.com/torvalds/linux/commit/09cbfeaf1a5a67bfb3201e0c83c810cecb2efa5a
 
-* Thu Jun 23 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18.1-1
+* Thu Jun 23 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18.1-1
 - Bumped to 1.6.18.1, which includes patches in previous release
 
-* Mon Jun 20 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-4
+* Mon Jun 20 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18-4
 - Add patches for 4.5+ kernels for f23+, rebased on
   openafs-stable-1_6_x branch
 
-* Mon May 9 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-2
+* Mon May 9 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18-2
 - Disable patch that can cause a deadlock, see
   https://gerrit.openafs.org/#/c/12267/
 
-* Mon May 9 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.18-1
+* Mon May 9 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.18-1
 - Bumped to 1.6.18
 - Also patch for 4.5 kernels in f24+
 
-* Wed Mar 16 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.17-1
+* Wed Mar 16 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.17-1
 - Bumped to 1.6.17
 - Also patch for 4.4 kernels in f22
 
-* Thu Mar 10 2016 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-2
+* Thu Mar 10 2016 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.16-2
 - Added patches to allow OpenAFS to compile on 4.4 kernel, patches only
   applied for f23 or greater
 - Added patch to disable use of splice() function for 4.4 kernel, only
   applied for f23 or greater
 
-* Thu Dec 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.16-1
+* Thu Dec 17 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.16-1
 - Bumped to 1.6.16
 
-* Wed Oct 28 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.15-1
+* Wed Oct 28 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.15-1
 - Bumped to 1.6.15
 - Addresses CVE-2015-7762 and CVE-2015-7763
 
-* Tue Sep 22 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14.1-1
+* Tue Sep 22 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.14.1-1
 - Bumped to 1.6.14.1
 
-* Mon Aug 17 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.14-1
+* Mon Aug 17 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.14-1
 - Bumped to 1.6.14
 
-* Mon Jul 20 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.12-2
+* Mon Jul 20 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.12-2
 - Replace source tarballs with ones prepared by openafs.org
 
-* Mon Jul 06 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.12-1
+* Mon Jul 06 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.12-1
 - Rebuilt for 1.6.12
 
-* Mon May 18 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11.1-1
+* Mon May 18 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.11.1-1
 - Rebuilt for 1.6.11.1
 
-* Mon Mar 02 2015 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.11-1.1
+* Mon Mar 02 2015 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.11-1.1
 - Rebuilt for 1.6.11
 
-* Wed Oct  1 2014 Jonathan S. Billings <jsbillin@umich.edu> - 1.6.9-1
+* Wed Oct  1 2014 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.6.9-1
 - Created initial spec file
 
