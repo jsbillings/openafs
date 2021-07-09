@@ -1,0 +1,81 @@
+From 0613526d1e698237e986f675659747d2ebc74e90 Mon Sep 17 00:00:00 2001
+From: Yadavendra Yadav <yadayada@in.ibm.com>
+Date: Wed, 7 Jul 2021 12:32:36 -0400
+Subject: [PATCH] afs: defer afs_remunlink when task->fs is NULL
+
+afs_remunlink can be called with task->fs as NULL, this typically
+happens when process is shutting down, task->fs is freed and
+closing of deleted files is happening. During afs_remunlink operation
+cache files needs to be updated, and for that dentry_open is called.
+dentry_open will call security_file_open which will result to a call
+to LSM for security checks. Certain LSM e.g Crowdstrike Falcon
+will result in kernel crash if task->fs is NULL.
+
+To handle above scenario defer afs_remunlink in case task->fs is NULL
+
+(Cherry-picked from 6b0a3c22417460372d383f8c0d24a5d8aec7265d)
+
+Change-Id: I1ee83d088a9b661d2974ce24b36bfd9f6ea4e7e9
+---
+ src/afs/LINUX/osi_vcache.c | 17 +++++++++++++++++
+ src/afs/afs_osi.h          |  6 ++++++
+ src/afs/afs_vcache.c       |  3 ++-
+ 3 files changed, 25 insertions(+), 1 deletion(-)
+
+diff --git a/src/afs/LINUX/osi_vcache.c b/src/afs/LINUX/osi_vcache.c
+index 19840d1ad..bd9bda501 100644
+--- a/src/afs/LINUX/osi_vcache.c
++++ b/src/afs/LINUX/osi_vcache.c
+@@ -236,3 +236,20 @@ out:
+     crfree(credp);
+     afs_DestroyReq(treq);
+ }
++
++int osi_ShouldDeferRemunlink(struct vcache *avc)
++{
++    if (current->fs == NULL) {
++/* Since we do not have fs_struct in task, it means remunlink
++ * has been called after task->fs is freed, once such case is when
++ * process is shutting down. For updating cache files dentry_open
++ * will be called, which in turn will call LSM to do a security
++ * checks while opening a file. Certain LSM e.g Crowdstrike Falcon
++ * will result in kernel crash if task struct has NULL fs.
++ * Inorder to avoid it we will defer remunlink in such cases, and
++ * later daemon thread will eventually call remunlink.
++ */
++        return 1;
++    }
++    return 0;
++}
+diff --git a/src/afs/afs_osi.h b/src/afs/afs_osi.h
+index acd5679ec..96c988510 100644
+--- a/src/afs/afs_osi.h
++++ b/src/afs/afs_osi.h
+@@ -454,4 +454,10 @@ extern afs_ucred_t afs_osi_cred, *afs_osi_credp;
+ #define AFS_NUMPAGGROUPS 2
+ #endif
+ 
++#ifdef AFS_LINUX26_ENV
++extern int osi_ShouldDeferRemunlink(struct vcache *avc);
++#else
++#define osi_ShouldDeferRemunlink(avc) 0
++#endif
++
+ #endif /* _AFS_OSI_ */
+diff --git a/src/afs/afs_vcache.c b/src/afs/afs_vcache.c
+index b9d6614ad..77f51709a 100644
+--- a/src/afs/afs_vcache.c
++++ b/src/afs/afs_vcache.c
+@@ -320,7 +320,8 @@ afs_InactiveVCache(struct vcache *avc, afs_ucred_t *acred)
+     avc->f.states &= ~CMAPPED;	/* mainly used by SunOS 4.0.x */
+     avc->f.states &= ~CDirty;	/* Turn it off */
+     if (avc->f.states & CUnlinked) {
+-	if (CheckLock(&afs_xvcache) || CheckLock(&afs_xdcache)) {
++	if (CheckLock(&afs_xvcache) || CheckLock(&afs_xdcache) ||
++            osi_ShouldDeferRemunlink(avc)) {
+ 	    avc->f.states |= CUnlinkedDel;
+ 	    return;
+ 	}
+-- 
+2.31.1
+

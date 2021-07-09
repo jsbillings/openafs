@@ -1,12 +1,12 @@
 # Openafs Spec $Revision$
 
-#define afsvers 1.8.6pre3
-%define afsvers 1.8.7
-%define pkgvers 1.8.7
+%define afsvers 1.8.8pre1
+#define afsvers 1.8.8
+%define pkgvers 1.8.8
 # for beta/rc releases make pkgrel 0.<tag>
 # for real releases make pkgrel 1 (or more for extra releases)
-#define pkgrel 0.pre3
-%define pkgrel 3
+%define pkgrel 0.pre1
+#define pkgrel 3
 %define kmod_name openafs
 %define dkms_version %{version}-%{pkgrel}%{?dist}
 
@@ -57,10 +57,7 @@ Source27: afs3-vlserver.xml
 Source28: afs3-volser.xml
 
 # Local patches
-# Add patch from upstream to address gcc-10 errors
-Patch01:  0001-Avoid-duplicate-definitions-of-globals.patch
-# Fix for kernel in RHEL8.4
-Patch02: LINUX-5.8-do-not-set-name-field-in-backing_dev_info.patch
+# None currently
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -308,10 +305,6 @@ AFS kernel module.
 %prep
 # Install OpenAFS src and doc
 %setup -q -b 1 -n %{srcdir}
-
-# Patching
-%patch01 -p1 -b .gcc10fix
-%patch02 -p1 -b .do-not-set-name-field-in-backing_dev_info.patch
 
 ##############################################################################
 #
@@ -1051,6 +1044,9 @@ dkms remove -m openafs -v %{dkms_version} --rpm_safe_upgrade --all ||:
 ###
 ##############################################################################
 %changelog
+* Mon Jun 14 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.8-0.pre1
+* Build 1.8.8pre1 packages
+
 * Tue May 25 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.7-3
 - Add patch to let kernel module build for RHEL8.4
   (https://gerrit.openafs.org/#/c/14268/)

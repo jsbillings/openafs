@@ -1,9 +1,9 @@
 # Openafs Spec $Revision$
-%define PACKAGE_VERSION 1.8.7
-#define afsvers 1.8.4pre2
-#define pkgrel 0.pre2
-%define afsvers 1.8.7
-%define pkgrel 3
+%define PACKAGE_VERSION 1.8.8
+%define afsvers 1.8.8pre1
+%define pkgrel 0.pre1.1
+#define afsvers 1.8.7
+#define pkgrel 3
 
 Summary: OpenAFS distributed filesystem
 Name: openafs-kmod
@@ -28,8 +28,8 @@ Source13: find-installed-kversion.sh
 Source14: openafs-kmodtool
 
 # Local patches
-Patch000: LINUX-Return-errors-in-our-d_revalidate.patch
-Patch001: LINUX-5.8-do-not-set-name-field-in-backing_dev_info.patch
+## Fix for kernel panic caused by Crowdstrike
+Patch00:  0001-afs-defer-afs_remunlink-when-task-fs-is-NULL.patch
 
 %description
 The AFS distributed filesystem.  AFS is a distributed filesystem
@@ -69,8 +69,7 @@ echo '%kversion'
 # Install OpenAFS src and doc
 %setup -q -n openafs-%{afsvers}
 # Patches
-%patch000 -p1 -b .Properly-revert-creds-in-osi_UFSTruncate
-%patch001 -p1 -b .do-not-set-name-field-in-backing_dev_info
+%patch00 -p1 -b .afs-defer-afs_remunlink-when-task-fs-is-NULL
 
 ##############################################################################
 #
@@ -149,6 +148,13 @@ cp %{SOURCE10} %{SOURCE11} .
 ###
 ##############################################################################
 %changelog
+* Fri Jul 9 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.8-0.pre1.1
+* Add patch to address kernel panic when running Crowdstrike
+  (https://gerrit.openafs.org/14691)
+
+* Mon Jun 14 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.8-0.pre1
+* Build 1.8.8pre1 packages
+
 * Tue May 25 2021 Jonathan S. Billings <jsbillings@jsbillings.org> - 1.8.7-3
 - Add patch to let kernel module build for RHEL8.4
   (https://gerrit.openafs.org/#/c/14268/)
